@@ -12,6 +12,28 @@
 
 一个Dockerfile创建多个镜像,可以使用多个 FROM 来创建
 
+### LABEL
+
+可以给镜像添加额外的信息
+
+<pre>
+# Set one or more individual labels
+LABEL com.example.version="0.0.1-beta"
+LABEL vendor="ACME Incorporated"
+LABEL com.example.release-date="2015-02-12"
+LABEL com.example.version.is-production=""
+
+# Set multiple labels on one line
+LABEL com.example.version="0.0.1-beta" com.example.release-date="2015-02-12"
+
+# Set multiple labels at once, using line-continuation characters to break long lines
+LABEL vendor=ACME\ Incorporated \
+      com.example.is-beta= \
+      com.example.is-production="" \
+      com.example.version="0.0.1-beta" \
+      com.example.release-date="2015-02-12"
+</pre>
+
 ### MAINTAINER
 
 如 ``` MAINTAINER xusihan@qq.com ``` 指定维护者的信息
@@ -25,6 +47,8 @@
 
 后者用 exec 执行。如 ``` RUN ["/bin/bash","-c","echo hello"] ```
 
+Docker建议避免执行一些更新程序的语句 ```apt-get update```
+ 如果需要更新程序 请联系镜像的维护者!
 ### CMD 
 
 指定启动容器的时候执行的命令。
@@ -51,9 +75,27 @@ Dokcer服务端容器暴露的端口号。 相当于启动容器时的 -P
 
 复制指定的```<src>``` 到容器中的 ```<dest>```  其中 ```<src>``` 可以是Dockerfile所在目录的一个相对路径;也可以是一个 URL ; 还可以是一个 tar文件(自动解压)
 
+
+如果需要从一个URL等地方获取资源:
+<pre>
+ADD http://example.com/big.tar.xz /usr/src/things/
+RUN tar -xJf /usr/src/things/big.tar.xz -C /usr/src/things
+RUN make -C /usr/src/things all
+</pre>
+
+更好的写法是:
+<pre>
+RUN mkdir -p /usr/src/things \
+    && curl -SL http://example.com/big.tar.xz \
+    | tar -xJC /usr/src/things \
+    && make -C /usr/src/things all
+</pre>
+
 ### COPY
 
 ``` COPY <src> <dest> ``` 复制本地主机的 ```<src>``` 到容器中的 ```<dest>```
+
+```COPY```更好 ,因为```COPY``` 更加直白,```ADD```会执行一些隐藏逻辑,比如解压。
 
 ### ENTRYPOINT
 
