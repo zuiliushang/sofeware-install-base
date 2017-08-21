@@ -76,4 +76,11 @@ starting container process caused "exec: \"nginx\": executable file not found in
 传播行为 | 行为作用
 ---|---
 shared | 源挂载项的子挂载项将暴露在复制挂载中,同样复制挂载的子挂载项也会暴露给源挂载项。
-slave | 单向挂载共享,如果```origin volume```
+slave | 单向挂载共享,如果```origin volume```暴露出```sub-mount```那么slave的sub-mount 将不会被origin的察觉到,相反也是。
+private | mount 私有,相互的```sub-mount```不被对方共享。
+rshared | 与共享相同,但传播也扩展到在任何原始或副本挂载点内嵌套的挂载点上。子项的子项都会被影响。
+rslave | 同slave,但传播也扩展到在任何原始或副本挂载点内嵌套的挂载点上。子项的子项都会被影响。
+rprivate | 默认,原始或副本挂载点内的任何挂载点都不会在任意方向上传播。
+
+>>在设置```bind propagation```之前,需要主机的文件系统支持```bind propagation```。
+
