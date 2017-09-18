@@ -100,3 +100,75 @@ Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=修改为
 Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=cgroupfs"
 [root@kubernetes-master ~]# systemctl daemon-reload
 </pre>
+
+## 设置开机启动
+<pre>
+[root@kubernetes-master ~]# systemctl enable docker 
+[root@kubernetes-master ~]# systemctl enable kubelet1 
+</pre>
+
+## 重启
+<pre>
+[root@kubernetes-master ~]# reboot
+</pre>
+
+## 运行admin init
+<pre>
+[root@kubernetes-master ~]# kubeadm init
+</pre>
+直到使用```kubectl get nodes```显示
+<pre>
+[root@kubernetes-master ~]# kubectl get nodes
+NAME                STATUS     AGE       VERSION
+kubernetes-master   NotReady   1m        v1.7.5
+</pre>
+这个时候镜像有:
+<pre>
+[root@kubernetes-master ~]# docker images
+REPOSITORY                                               TAG                 IMAGE ID            CREATED             SIZE
+gcr.io/google_containers/kube-controller-manager-amd64   v1.7.6              028bd65dc783        3 days ago          138MB
+gcr.io/google_containers/kube-scheduler-amd64            v1.7.6              c3101592d24c        3 days ago          77.2MB
+gcr.io/google_containers/kube-apiserver-amd64            v1.7.6              f15a956e781d        3 days ago          186MB
+gcr.io/google_containers/etcd-amd64                      3.0.17              243830dae7dd        6 months ago        169MB
+gcr.io/google_containers/pause-amd64                     3.0                 99e59f495ffa        16 months ago       747kB
+</pre>
+查看``` kubectl get pod --all-namespaces```
+<pre>
+[root@kubernetes-master ~]# kubectl get pod --all-namespaces
+NAMESPACE     NAME                                        READY     STATUS    RESTARTS   AGE
+kube-system   etcd-kubernetes-master                      1/1       Running   0          1m
+kube-system   kube-apiserver-kubernetes-master            1/1       Running   0          1m
+kube-system   kube-controller-manager-kubernetes-master   1/1       Running   0          1m
+kube-system   kube-dns-2425271678-m9mx1                   0/3       Pending   0          6m
+kube-system   kube-proxy-484jp                            1/1       Running   0          6m
+kube-system   kube-scheduler-kubernetes-master            1/1       Running   0          1m
+</pre>
+发现```kube-system   kube-dns-2425271678-m9mx1                   0/3       Pending   0          6m ```
+##设置master为主节点
+<pre>
+[root@kubernetes-master ~]# kubectl taint nodes --all node-role.kubernetes.io/master
+</pre>
+
+##安装 kubernetes 网络
+<pre>
+[root@kubernetes-master ~]# kubectl apply -f https://git.io/weave-kube-1.6
+serviceaccount "weave-net" created
+clusterrole "weave-net" created
+clusterrolebinding "weave-net" created
+daemonset "weave-net" created
+</pre>
+
+之后就能看到
+<pre>
+[root@kubernetes-master ~]# kubectl get pods --all-namespaces
+NAMESPACE     NAME                                        READY     STATUS    RESTARTS   AGE
+kube-system   etcd-kubernetes-master                      1/1       Running   0          24m
+kube-system   kube-apiserver-kubernetes-master            1/1       Running   0          24m
+kube-system   kube-controller-manager-kubernetes-master   1/1       Running   0          24m
+kube-system   kube-dns-2425271678-7w2fn                   3/3       Running   0          29m
+kube-system   kube-proxy-v816q                            1/1       Running   0          29m
+kube-system   kube-scheduler-kubernetes-master            1/1       Running   0          24m
+kube-system   weave-net-r7mx9                             2/2       Running   0          18m
+</pre>
+
+表示成功
