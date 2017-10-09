@@ -104,12 +104,22 @@ Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=cgroupfs"
 ## 设置开机启动
 <pre>
 [root@kubernetes-master ~]# systemctl enable docker 
-[root@kubernetes-master ~]# systemctl enable kubelet1 
+[root@kubernetes-master ~]# systemctl enable kubelet
 </pre>
 
 ## 重启
 <pre>
 [root@kubernetes-master ~]# reboot
+</pre>
+
+## 设置iptables
+<pre>
+[root@kubernetes-master ~]# echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+</pre>
+
+## 重置kubeadm
+<pre>
+[root@kubernetes-master ~]# kubeadm reset
 </pre>
 
 ## 运行admin init
