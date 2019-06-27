@@ -27,3 +27,6 @@ Questions? Try the support group
 2018-01-11T08:13:29.681+0000 E -        [main] Error loading history file: FileOpenFailed: Unable to fopen() file /root/.dbshell: No such file or directory
 > 
 </pre>
+
+
+`https://www.jianshu.com/p/86fc8a53aad5`
